@@ -1,0 +1,3 @@
+#!/command/execlineb -P
+
+/command/with-contenv sh /etc/s6-overlay/s6-rc.d/sshd/script.sh
