@@ -26,6 +26,7 @@ USER_PASSWORD=${USER_PASSWORD:-$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c"${
 echo "${USER_NAME}:${USER_PASSWORD}" | chpasswd
 
 # Setup config folder
+mkdir -p /config/nginx
 mkdir -p /config/sshd
 mkdir -p /config/.ssh
 mkdir -p /config/logs/sshd
@@ -36,6 +37,7 @@ if [ ! -f /config/nginx/mime.types ]; then
 fi
 
 if [ ! -f /config/nginx/nginx.conf ]; then
+    echo "#### Copy default nginx.conf."
     cp /etc/nginx/nginx.conf /config/nginx/nginx.conf
 fi
 
@@ -135,7 +137,6 @@ server {
     }
 EOF
 
-env
 if [[ -n "$HTTP_SERVE_FOLDER" ]] && [[ -d "$HTTP_SERVE_FOLDER" ]]; then
     echo "### Nginx serves $HTTP_SERVE_FOLDER..."
     HTTP_SERVE_ROUTE=${HTTP_SERVE_ROUTE:-/static}
@@ -174,3 +175,7 @@ chmod 600 /config/.ssh/authorized_keys
 chown -R root:"${USER_NAME}" /config/sshd
 chmod 750 /config/sshd
 chmod 640 /config/sshd/sshd_config
+
+if [[ -n "$HTTP_SERVE_FOLDER" ]] && [[ -d "$HTTP_SERVE_FOLDER" ]]; then
+    chown -R "${USER_NAME}":"${USER_NAME}" $HTTP_SERVE_FOLDER
+fi
