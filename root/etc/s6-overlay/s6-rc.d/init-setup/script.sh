@@ -129,11 +129,11 @@ fi
 # Setup nginx
 if [ ! -n "$(ls -A -- "/config/nginx/http.d/")" ]; then
     HTTP_PORT=${HTTP_PORT:-8080}
-    echo "### Nginx has no http site"
+    echo "### Nginx has no http site. Setting default server on port=$HTTP_PORT"
 cat > /config/nginx/http.d/default.conf << EOF
 server {
-    listen 8080 default_server;
-    listen [::]:8080 default_server;
+    listen $HTTP_PORT default_server;
+    listen [::]:$HTTP_PORT default_server;
 
     # health check
     location / {
