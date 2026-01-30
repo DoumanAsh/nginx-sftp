@@ -44,12 +44,12 @@ fi
 mkdir -p /config/nginx/conf.d
 mkdir -p /config/nginx/http.d
 if [ ! -d /config/nginx/modules ]; then
-    echo "### Generating SSH keys"
     mkdir -p /config/nginx/modules
     cp -rf /etc/nginx/modules /config/nginx/modules
 fi
 
 if [ ! -d /config/ssh_host_keys ]; then
+    echo "### Generating SSH keys"
     mkdir -p /config/ssh_host_keys
     ssh-keygen -A
     cp /etc/ssh/ssh_host_* /config/ssh_host_keys
