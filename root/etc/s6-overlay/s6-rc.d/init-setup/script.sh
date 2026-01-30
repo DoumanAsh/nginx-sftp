@@ -103,11 +103,13 @@ if [[ ! -f /config/.ssh/authorized_keys ]]; then
 fi
 
 # Enable user's PUBLIC_KEY to be used with his user account only
+if ! grep -q "Match User ${USER_NAME}" /config/sshd/sshd_config ; then
 cat >> /config/sshd/sshd_config << EOF
 Match User ${USER_NAME}
     ForceCommand internal-sftp -d /config
     AuthorizedKeysFile /config/.ssh/authorized_keys
 EOF
+fi
 
 if [[ -n "$PUBLIC_KEY" ]]; then
     if ! grep -q "${PUBLIC_KEY}" /config/.ssh/authorized_keys ; then
