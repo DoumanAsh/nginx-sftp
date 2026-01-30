@@ -102,8 +102,15 @@ if [[ ! -f /config/.ssh/authorized_keys ]]; then
     touch /config/.ssh/authorized_keys
 fi
 
+# Enable user's PUBLIC_KEY to be used with his user account only
+cat >> /config/sshd/sshd_config << EOF
+Match User ${USER_NAME}
+    ForceCommand internal-sftp -d /config
+    AuthorizedKeysFile /config/.ssh/authorized_keys
+EOF
+
 if [[ -n "$PUBLIC_KEY" ]]; then
-    if [[ ! grep -q "${PUBLIC_KEY}" /config/.ssh/authorized_keys ]]; then
+    if ! grep -q "${PUBLIC_KEY}" /config/.ssh/authorized_keys ; then
         echo "$PUBLIC_KEY" >> /config/.ssh/authorized_keys
         echo "### Public key from env variable added"
     fi
@@ -111,7 +118,7 @@ fi
 
 if [[ -n "$PUBLIC_KEY_FILE" ]] && [[ -f "$PUBLIC_KEY_FILE" ]]; then
     PUBLIC_KEY2=$(cat "$PUBLIC_KEY_FILE")
-    if [[! grep -q "$PUBLIC_KEY2" /config/.ssh/authorized_keys]]; then
+    if ! grep -q "$PUBLIC_KEY2" /config/.ssh/authorized_keys ; then
         echo "$PUBLIC_KEY2" >> /config/.ssh/authorized_keys
         echo "### Public key from file added"
     fi
@@ -170,7 +177,8 @@ fi
 chown -R "${USER_NAME}":"${USER_NAME}" /config
 chmod go-w /config
 chmod 700 /config/.ssh
-chmod 600 /config/.ssh/authorized_keys
+chown -R "${USER_NAME}":"${USER_NAME}" /config/.ssh/authorized_keys
+chmod 640 /config/.ssh/authorized_keys
 
 chown -R root:"${USER_NAME}" /config/sshd
 chmod 750 /config/sshd
