@@ -12,6 +12,8 @@ Simple docker container to run sftp server with nginx serving static files side 
 - `USER_NAME` - Configures user name. Defaults to `dev`;
 - `SUDO_ACCESS` - Configures whether to enable sudo on account or not;
 - `USER_PASSWORD` - Specifies password of the user account;
+    - This password is only used to secure SFTP access
+    - To protect HTTP endpoint you should mount `/config/nginx/.htpasswd`
 - `PASSWORD_ACCESS` - Specifies whether to allow password access over ssh;
 - `SSH_PORT` - Configures port for SSH service to listen on. Defaults to 2222;
 - `HTTP_PORT` - Configures port for default HTTP service to listen on. Defaults to 8080;
@@ -32,4 +34,4 @@ You can mount it to persist stuff
 - HTTP service
     - `/config/nginx/http.d/` - Folder can be mounted to provider nginx HTTP sites. If none exists, default is created as `/config/nginx/http.d/default.conf`
     - `/config/nginx/conf.d/` - Folder can be mounted to provider nginx general configuration
-    - `/config/nginx/.htpasswd/` - File can be mounted to provide credentials
+    - `/config/nginx/.htpasswd` - File can be mounted to provide credentials
