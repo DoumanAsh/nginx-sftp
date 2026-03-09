@@ -1,11 +1,18 @@
 #!/usr/bin/with-contenv sh
 
 USER_NAME=${USER_NAME:-defaultuser}
+USER_CWD=${USER_CWD:-/home/$USER_NAME}
 PUID=${PUID:-911}
 PGID=${PGID:-911}
 
-echo "### Setup user ${USER_NAME} with uid=${PUID} and gid=${PGID}"
-adduser -D -u $PUID $USER_NAME
+if [ ! -d $USER_CWD ]; then
+    echo "### Setup user ${USER_NAME}(uid=${PUID}, gid=${PGID}) with home=$USER_CWD"
+    adduser -D -u $PUID $USER_NAME -h $USER_CWD
+else
+    echo "### Setup user ${USER_NAME}(uid=${PUID}, gid=${PGID}) with cwd=$USER_CWD"
+    # Folder exists, so do not attempt to create home like structure
+    adduser -D -u $PUID $USER_NAME -h $USER_CWD -H
+fi
 #addgroup -g $PGID $USER_NAME
 
 # set password for user to unlock it and set sudo access
@@ -106,7 +113,6 @@ fi
 if ! grep -q "Match User ${USER_NAME}" /config/sshd/sshd_config ; then
 cat >> /config/sshd/sshd_config << EOF
 Match User ${USER_NAME}
-    ForceCommand internal-sftp -d /config
     AuthorizedKeysFile /config/.ssh/authorized_keys
 EOF
 fi

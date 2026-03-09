@@ -10,6 +10,7 @@ Simple docker container to run sftp server with nginx serving static files side 
 - `PUID` - Configures user id;
 - `PGID` - Configures group id of the above user;
 - `USER_NAME` - Configures user name. Defaults to `dev`;
+- `USER_CWD` - Customizes user's initial folder. If no folder exists, creates home like folder. Defaults to `/home/$USER_NAME`;
 - `SUDO_ACCESS` - Configures whether to enable sudo on account or not;
 - `USER_PASSWORD` - Specifies password of the user account;
     - This password is only used to secure SFTP access
