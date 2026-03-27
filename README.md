@@ -21,6 +21,7 @@ Simple docker container to run sftp server with nginx serving static files side 
 - `HTTP_SERVE_ROUTE` - Configures http route to serve `$HTTP_SERVE_FOLDER` in default HTTP service. Defaults to `/static`;
 - `HTTP_SERVE_FOLDER` - Configures folder to serve in default HTTP service. Defaults to None;
 - `HTTP_SERVE_HTPASSWD` - Specifies path to the basic auth credentials. Defaults to `/config/nginx/.htpasswd`
+- `HTTP_SERVE_UPLOAD_ROUTE` - Configures http route to allow upload into `$HTTP_SERVE_FOLDER`. Defaults to None;
 - `UMASK` - Specifies umask value for SFTP service;
 - `PUBLIC_KEY` - Specifies public key to authorize access from;
 - `PUBLIC_KEY_FILE` - Specifies path to the public key to authorize access from;

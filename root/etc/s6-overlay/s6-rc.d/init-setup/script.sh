@@ -155,16 +155,16 @@ EOF
 if [[ -n "$HTTP_SERVE_FOLDER" ]] && [[ -d "$HTTP_SERVE_FOLDER" ]]; then
     echo "### Nginx serves $HTTP_SERVE_FOLDER..."
     HTTP_SERVE_ROUTE=${HTTP_SERVE_ROUTE:-/static}
-echo "    location $HTTP_SERVE_ROUTE {" >> /config/nginx/http.d/default.conf
+    echo "    location $HTTP_SERVE_ROUTE {" >> /config/nginx/http.d/default.conf
 
     HTTP_SERVE_HTPASSWD=${HTTP_SERVE_HTPASSWD:-/config/nginx/.htpasswd}
     if [[ -f "$HTTP_SERVE_HTPASSWD" ]]; then
-    echo "### Nginx enables basic auth"
+        echo "### Nginx enables basic auth"
 cat >> /config/nginx/http.d/default.conf << EOF
         auth_basic           "Restricted File Area";
         auth_basic_user_file $HTTP_SERVE_HTPASSWD;
 EOF
-    fi
+    fi # Enable auth
 
 cat >> /config/nginx/http.d/default.conf << EOF
         alias $HTTP_SERVE_FOLDER;
@@ -175,7 +175,30 @@ cat >> /config/nginx/http.d/default.conf << EOF
     }
 EOF
 
-fi
+    if [[ -n "$HTTP_SERVE_UPLOAD_ROUTE" ]]; then
+        echo "### Nginx enables uploads to $HTTP_SERVE_FOLDER..."
+        echo "    location ~ \"$HTTP_SERVE_UPLOAD_ROUTE/([\\s\\S]*)$\" {" >> /config/nginx/http.d/default.conf
+
+        if [[ -f "$HTTP_SERVE_HTPASSWD" ]]; then
+cat >> /config/nginx/http.d/default.conf << EOF
+        auth_basic           "Restricted File Area";
+        auth_basic_user_file $HTTP_SERVE_HTPASSWD;
+EOF
+        fi # Enable auth
+
+cat >> /config/nginx/http.d/default.conf << EOF
+        alias $HTTP_SERVE_FOLDER/\$1;
+
+        client_body_temp_path /tmp/uploads;
+        dav_methods PUT DELETE MKCOL COPY MOVE;
+
+        create_full_put_path on;
+        dav_access           group:rw all:r;
+    }
+EOF
+
+    fi
+fi # HTTP_SERVE_FOLDER exists
 
 echo "}" >> /config/nginx/http.d/default.conf
 
