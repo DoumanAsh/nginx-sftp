@@ -49,6 +49,8 @@ jobs:
 
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v4
+        with:
+          platforms: linux/amd64,linux/arm64
 
       - name: Log into ${{ env.DOCKER_REGISTRY }} registry
         if: github.event_name != 'pull_request'
@@ -116,6 +118,8 @@ jobs:
 
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v4
+        with:
+          platforms: linux/amd64,linux/arm64
 
       - name: Log into ${{ env.DOCKER_REGISTRY }} registry
         if: github.event_name != 'pull_request'

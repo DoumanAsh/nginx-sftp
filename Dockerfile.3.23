@@ -13,8 +13,14 @@ RUN apk update && \
     # Install s6-overlay
     wget https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz -O /tmp/noarch.tar.xz && \
     tar -C / -Jxpf /tmp/noarch.tar.xz && \
-    wget https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz -O /tmp/x86_64.tar.xz && \
-    tar -C / -Jxpf /tmp/x86_64.tar.xz && \
+    apkArch="$(apk --print-arch)"; \
+    case "$apkArch" in \
+        x86_64) OVERLAY_ARCH='x86_64' ;; \
+        aarch64) OVERLAY_ARCH='aarch64' ;; \
+        *) echo >&2 "unsupported architecture: $apkArch"; exit 1 ;; \
+    esac; \
+    wget https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.xz -O /tmp/${OVERLAY_ARCH}.tar.xz && \
+    tar -C / -Jxpf /tmp/${OVERLAY_ARCH}.tar.xz && \
     rm /tmp/*.tar.xz && \
     rm -rf $HOME/.cache
 
