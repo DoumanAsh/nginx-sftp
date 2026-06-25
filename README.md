@@ -3,7 +3,17 @@
 [![Build](https://github.com/DoumanAsh/nginx-sftp/actions/workflows/docker-image.yml/badge.svg)](https://github.com/DoumanAsh/nginx-sftp/actions/workflows/docker-image.yml)
 [![Hub](https://img.shields.io/badge/Docker-Hub-2496ed.svg)](https://hub.docker.com/r/douman/nginx-sftp/tags)
 
-Simple docker container to run sftp server with nginx serving static files side by side based on [linuxserver/docker-openssh-server](https://github.com/linuxserver/docker-openssh-server)
+Simple docker container to run sftp server with nginx serving static files side by side inspired by [linuxserver/docker-openssh-server](https://github.com/linuxserver/docker-openssh-server) but with minimal amount of fluff
+
+## Versioning
+
+- `nginx-sftp:latest` - Uses latest stable alpine image. Can be change with release of new stable alpine
+- `nginx-sftp:<alpine version>` - Use specific alpine version for stability. Always matches specific alpine version
+
+As container uses stable alpine image following packages are used by `latest` image:
+
+- [nginx](https://pkgs.alpinelinux.org/packages?name=nginx&branch=v3.24&repo=&arch=x86_64&origin=&flagged=&maintainer=)
+- [openssh](https://pkgs.alpinelinux.org/packages?name=openssh-sftp-server&branch=v3.24&repo=&arch=x86_64&origin=&flagged=&maintainer=)
 
 ## Environment variables
 
