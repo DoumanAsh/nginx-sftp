@@ -8,7 +8,7 @@ RUN apk update && \
     # Generate SSH host keys
     ssh-keygen -A && \
     # Create necessary directories for s6-overlay services
-    mkdir -p /etc/s6-overlay/s6-rc.d/nginx /etc/s6-overlay/s6-rc.d/sshd /etc/s6-overlay/s6-rc.d/user && \
+    mkdir -p /etc/s6-overlay/s6-rc.d/nginx /etc/s6-overlay/s6-rc.d/sshd && \
     # Setup SSHD configuration
     sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config && \
     # Install s6-overlay
