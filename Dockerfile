@@ -1,6 +1,7 @@
-FROM alpine:3.24
+ARG ALPINE_VERSION=3.24
+FROM alpine:$ALPINE_VERSION
 
-ARG S6_OVERLAY_VERSION=3.2.3.0
+ARG S6_OVERLAY_VERSION=3.2.3.2
 
 RUN apk update && \
     apk add --no-cache nginx openssh-server-pam openssh-sftp-server sudo && \

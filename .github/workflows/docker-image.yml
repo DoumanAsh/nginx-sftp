@@ -73,7 +73,9 @@ jobs:
         id: build-docker
         uses: docker/build-push-action@v7
         with:
-          file: Dockerfile.${{ env.LATEST_ALPINE_VERSION }}
+          file: Dockerfile
+          build-args: |
+            ALPINE_VERSION=${{ env.LATEST_ALPINE_VERSION }}
           context: .
           platforms: linux/amd64
           load: true
@@ -85,7 +87,9 @@ jobs:
         id: push-docker
         uses: docker/build-push-action@v7
         with:
-          file: Dockerfile.${{ env.LATEST_ALPINE_VERSION }}
+          file: Dockerfile
+          build-args: |
+            ALPINE_VERSION=${{ env.LATEST_ALPINE_VERSION }}
           context: .
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
@@ -142,7 +146,9 @@ jobs:
         id: build-docker
         uses: docker/build-push-action@v7
         with:
-          file: Dockerfile.${{ matrix.alpine_version }}
+          file: Dockerfile
+          build-args: |
+            ALPINE_VERSION=${{ matrix.alpine_version }}
           context: .
           platforms: linux/amd64
           load: true
@@ -154,11 +160,12 @@ jobs:
         id: push-docker
         uses: docker/build-push-action@v7
         with:
-          file: Dockerfile.${{ matrix.alpine_version }}
+          file: Dockerfile
+          build-args: |
+            ALPINE_VERSION=${{ matrix.alpine_version }}
           context: .
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.alpine_version }}
             ${{ env.GITHUB_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:${{ matrix.alpine_version }}
-
