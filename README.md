@@ -5,6 +5,25 @@
 
 Simple docker container to run sftp server with nginx serving static files side by side inspired by [linuxserver/docker-openssh-server](https://github.com/linuxserver/docker-openssh-server) but with minimal amount of fluff
 
+## Usage
+
+### Kubernetes deployment via terraform
+
+Following [gist](https://gist.github.com/DoumanAsh/c8eacc4a58d1682b17dbbdd2655d7d68) can be used to facilitate simple deployment of this nginx-sftp setup to provide access via both SFTP and HTTP interface to read/write files
+
+It requires ability to provision [PVC](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) so consider alternatives if your cluster doesn't provide ability for it.
+
+Persistent volume is required to ensure data persistence across deployment rollouts, you can also opt to use `emptyDir` volume if you do not need data persistence
+
+As result this terraform gist will deploy two kubernetes services:
+- `dev-openssh-server` - Deploys SFTP server that accepts ssh connections over port 12222
+- `dev-file-server` - Deploys HTTP server that accepts HTTP requests over port 12223
+
+These service names can be used to access endpoints within kubernetes network.
+For connections outside of the cluster, consider using load balancer that targets your `dev-file-server`
+
+This gist is designed to prepare environment for testing code that performs SFTP interactions with HTTP interface serving as means to prepare storage and verify code's SFTP interactions
+
 ## Versioning
 
 - `nginx-sftp:latest` - Uses latest stable alpine image. Can be change with release of new stable alpine
