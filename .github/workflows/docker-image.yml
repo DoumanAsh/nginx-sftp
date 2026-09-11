@@ -74,6 +74,8 @@ jobs:
       - name: Build Docker image
         id: build-docker
         uses: docker/build-push-action@v7
+        env:
+          DOCKER_BUILD_SUMMARY: false
         with:
           file: Dockerfile
           build-args: |
@@ -84,6 +86,64 @@ jobs:
           tags: |
             ${{env.DOCKER_REGISTRY}}/${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.alpine_version }}
             ${{env.GITHUB_REGISTRY}}/${{ env.GITHUB_IMAGE_NAME }}:${{ matrix.alpine_version }}
+
+      - name: Run vulnerability scanner
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: "${{env.DOCKER_REGISTRY}}/${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.alpine_version }}"
+          format: 'json'
+          vuln-type: 'os,library'
+          severity: 'LOW,MEDIUM,HIGH,CRITICAL'
+          cache: 'false'
+          output: 'trivy.json'
+          version: latest
+          exit-code: 0
+
+      - name: Generate trivy.html fragment
+        shell: bash
+        env:
+          TRIVY_JSON: trivy.json
+        run: |
+          echo '<h3>Summary</h3>' >> trivy.html
+          echo '<ul>' >> trivy.html
+          jq -r '
+            [.Results[]?.Vulnerabilities[]?.Severity // "UNKNOWN"]
+            | group_by(.) | map("<li>\(.[0]): \(length)</li>") | .[]
+          ' "$TRIVY_JSON" >> trivy.html
+          echo '</ul>' >> trivy.html
+
+          echo '<h3>Full list</h3>' >> trivy.html
+          echo '<table><thead><tr><th>Severity</th><th>PkgName</th><th>InstalledVersion</th><th>FixedVersion</th><th>Status</th><th>Title</th></tr></thead><tbody>' >> trivy.html
+          jq -r '.Results[]?.Vulnerabilities[]?|"<tr><td>\(.Severity//""|@html)</td><td>\(.PkgName//""|@html)</td><td>\(.InstalledVersion//""|@html)</td><td>\(.FixedVersion//""|@html)</td><td>\(.Status//""|@html)</td><td>\(.Title//""|@html)</td></tr>"' "$TRIVY_JSON" >> trivy.html
+          echo '</tbody></table>' >> trivy.html
+
+      - name: Paste Trivy report into github
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          # Pass html fragment as {{{content}}}
+          path: trivy.html
+          # Creates new comment deleting old one
+          recreate: true
+          message: |
+            ## Vulnerabilities report 🔓
+
+            {{{content}}}
+
+      - name: Generate summary
+        id: test
+        env:
+          IMAGE_REF: ${{env.DOCKER_REGISTRY}}/${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.alpine_version }}
+        run: |
+          echo '## Build docker ${{ matrix.alpine_version }} image 🚀' >> $GITHUB_STEP_SUMMARY
+          VERSION=$(docker run --rm --entrypoint nginx $IMAGE_REF -version 2>&1 | cut -d" " -f3 | cut -d"/" -f2)
+          echo "- Nginx version: $VERSION" >> $GITHUB_STEP_SUMMARY
+          VERSION=$(docker run --rm --entrypoint sshd.pam $IMAGE_REF -V 2>&1 | cut -d"," -f1 | cut -d"_" -f2)
+          echo "- Openssh version: $VERSION" >> $GITHUB_STEP_SUMMARY
+          VERSION=$(docker run --rm --entrypoint cat $IMAGE_REF /etc/alpine-release | cut -d"." -f 1,2)
+          echo "- Alpine version: $VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "## Vulnerabilities report 🔓" >> $GITHUB_STEP_SUMMARY
+          cat trivy.html >> $GITHUB_STEP_SUMMARY
 
       - name: Push Docker image
         id: push-docker
