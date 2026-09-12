@@ -63,6 +63,16 @@ jobs:
           ## Set in repo Settings->Secrets->New repository secret
           password: ${{ secrets.DOCKER_TOKEN }}
 
+      # Access to docker hardened images
+      - name: Log into dhi.io registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v4
+        with:
+          registry: dhi.io
+          username: douman
+          ## Set in repo Settings->Secrets->New repository secret
+          password: ${{ secrets.DOCKER_TOKEN }}
+
       - name: Log into ${{ env.GITHUB_REGISTRY }} registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v4
@@ -140,7 +150,7 @@ jobs:
           echo "- Nginx version: $VERSION" >> $GITHUB_STEP_SUMMARY
           VERSION=$(docker run --rm --entrypoint sshd.pam $IMAGE_REF -V 2>&1 | cut -d"," -f1 | cut -d"_" -f2)
           echo "- Openssh version: $VERSION" >> $GITHUB_STEP_SUMMARY
-          VERSION=$(docker run --rm --entrypoint cat $IMAGE_REF /etc/alpine-release | cut -d"." -f 1,2)
+          VERSION=$(docker run --rm --entrypoint cat $IMAGE_REF /etc/os-release | grep VERSION_ID | cut -d"=" -f2 | cut -d"." -f 1,2)
           echo "- Alpine version: $VERSION" >> $GITHUB_STEP_SUMMARY
           echo "## Vulnerabilities report 🔓" >> $GITHUB_STEP_SUMMARY
           cat trivy.html >> $GITHUB_STEP_SUMMARY
