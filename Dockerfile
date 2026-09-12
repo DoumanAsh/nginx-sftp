@@ -4,7 +4,7 @@ FROM alpine:$ALPINE_VERSION
 ARG S6_OVERLAY_VERSION=3.2.3.2
 
 RUN apk update && \
-    apk add --no-cache nginx openssh-server-pam openssh-sftp-server sudo && \
+    apk add --no-cache nginx openssh-server-pam openssh-sftp-server sudo logrotate && \
     # Generate SSH host keys
     ssh-keygen -A && \
     # Create necessary directories for s6-overlay services
@@ -23,6 +23,7 @@ RUN apk update && \
     wget https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.xz -O /tmp/${OVERLAY_ARCH}.tar.xz && \
     tar -C / -Jxpf /tmp/${OVERLAY_ARCH}.tar.xz && \
     rm /tmp/*.tar.xz && \
+    rm -rf /etc/logrotate.d && \
     rm -rf $HOME/.cache
 
 # Copy all setup

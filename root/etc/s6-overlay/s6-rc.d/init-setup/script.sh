@@ -32,6 +32,25 @@ fi
 USER_PASSWORD=${USER_PASSWORD:-$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c"${1:-8}";echo;)}
 echo "${USER_NAME}:${USER_PASSWORD}" | chpasswd
 
+# Setup logrotate for nginx
+mkdir -p /etc/logrotate.d/
+cat >> /etc/logrotate.d/nginx << EOF
+/config/logs/nginx/*.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    nodateext
+    notifempty
+    missingok
+    sharedscripts
+    postrotate
+        nginx -s reload
+    endscript
+    su ${USER_NAME} ${USER_NAME}
+}
+EOF
+
 # Setup config folder
 mkdir -p /config/nginx
 mkdir -p /config/sshd
