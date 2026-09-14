@@ -23,6 +23,7 @@ on:
 env:
   DOCKER_REGISTRY: docker.io
   GITHUB_REGISTRY: ghcr.io
+  QUAY_REGISTRY: quay.io
   DOCKER_IMAGE_NAME: douman/nginx-sftp
   GITHUB_IMAGE_NAME: doumanash/nginx-sftp
   LATEST_ALPINE_VERSION: 3.24
@@ -81,6 +82,15 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Log into ${{ env.QUAY_REGISTRY }} registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.QUAY_REGISTRY }}
+          username: doumanash+nginx-sftp-ci
+          ## Set in repo Settings->Secrets->New repository secret
+          password: ${{ secrets.QUAY_TOKEN }}
+
       - name: Build Docker image
         id: build-docker
         uses: docker/build-push-action@v7
@@ -96,6 +106,7 @@ jobs:
           tags: |
             ${{env.DOCKER_REGISTRY}}/${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.alpine_version }}
             ${{env.GITHUB_REGISTRY}}/${{ env.GITHUB_IMAGE_NAME }}:${{ matrix.alpine_version }}
+            ${{env.QUAY_REGISTRY}}/${{ env.GITHUB_IMAGE_NAME }}:${{ matrix.alpine_version }}
 
       - name: Run vulnerability scanner
         uses: aquasecurity/trivy-action@v0.36.0
@@ -170,6 +181,7 @@ jobs:
           tags: |
             ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.alpine_version }}
             ${{ env.GITHUB_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:${{ matrix.alpine_version }}
+            ${{ env.QUAY_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:${{ matrix.alpine_version }}
 
       - name: Push latest Docker image
         id: push-latest-docker
@@ -188,3 +200,5 @@ jobs:
             ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.alpine_version }}
             ${{ env.GITHUB_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:latest
             ${{ env.GITHUB_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:${{ matrix.alpine_version }}
+            ${{ env.QUAY_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:latest
+            ${{ env.QUAY_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:${{ matrix.alpine_version }}
