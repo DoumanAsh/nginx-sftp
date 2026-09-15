@@ -34,7 +34,7 @@ echo "${USER_NAME}:${USER_PASSWORD}" | chpasswd
 
 # Setup logrotate for nginx
 mkdir -p /etc/logrotate.d/
-cat >> /etc/logrotate.d/nginx << EOF
+cat > /etc/logrotate.d/nginx << EOF
 /config/logs/nginx/*.log {
     daily
     rotate 7
@@ -57,6 +57,12 @@ mkdir -p /config/sshd
 mkdir -p /config/.ssh
 mkdir -p /config/logs/sshd
 mkdir -p /config/logs/nginx
+# Setup crond config
+mkdir -p /config/crontabs
+cat > /config/crontabs/root << EOF
+# min   hour    day     month   weekday command
+0       2       *       *       *       run-parts /etc/periodic/daily
+EOF
 
 if [ ! -f /config/nginx/mime.types ]; then
     cp /etc/nginx/mime.types /config/nginx/mime.types
