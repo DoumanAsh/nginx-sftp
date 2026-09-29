@@ -2,6 +2,7 @@
 
 [![Build](https://github.com/DoumanAsh/nginx-sftp/actions/workflows/docker-image.yml/badge.svg)](https://github.com/DoumanAsh/nginx-sftp/actions/workflows/docker-image.yml)
 [![Hub](https://img.shields.io/badge/Docker-Hub-2496ed.svg)](https://hub.docker.com/r/douman/nginx-sftp/tags)
+[![Quay](https://img.shields.io/badge/quay.io-douman%2Fnginx--sftp-blue)](https://quay.io/repository/doumanash/nginx-sftp)
 
 Simple docker [container](https://quay.io/repository/doumanash/nginx-sftp) to run sftp server with nginx serving static files side by side inspired by [linuxserver/docker-openssh-server](https://github.com/linuxserver/docker-openssh-server) but with minimal amount of fluff
 
