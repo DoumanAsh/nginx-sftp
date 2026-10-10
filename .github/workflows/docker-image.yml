@@ -164,7 +164,7 @@ jobs:
           echo "- Nginx version: $VERSION" >> $GITHUB_STEP_SUMMARY
           VERSION=$(docker run --rm --entrypoint sshd.pam $IMAGE_REF -V 2>&1 | cut -d"," -f1 | cut -d"_" -f2)
           echo "- Openssh version: $VERSION" >> $GITHUB_STEP_SUMMARY
-          VERSION=$(docker run --rm --entrypoint cat $IMAGE_REF /etc/os-release | grep VERSION_ID | cut -d"=" -f2 | cut -d"." -f 1,2)
+          VERSION=$(docker run --rm --entrypoint cat $IMAGE_REF /etc/os-release | grep VERSION_ID | cut -d"=" -f2 | tr -d '"' | cut -d"." -f 1,2)
           echo "- Alpine version: $VERSION" >> $GITHUB_STEP_SUMMARY
           echo "## Vulnerabilities report 🔓" >> $GITHUB_STEP_SUMMARY
           cat trivy.html >> $GITHUB_STEP_SUMMARY
