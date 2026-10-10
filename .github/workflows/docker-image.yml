@@ -126,16 +126,19 @@ jobs:
           TRIVY_JSON: trivy.json
         run: |
           echo '<h3>Summary</h3>' >> trivy.html
-          echo '<ul>' >> trivy.html
           jq -r '
-            [.Results[]?.Vulnerabilities[]?.Severity // "UNKNOWN"]
-            | group_by(.) | map("<li>\(.[0]): \(length)</li>") | .[]
+            [.Results[]?.Vulnerabilities[]? | select(.Severity != null)] as $vulns
+            | if ($vulns | length) == 0 then
+                "<p>No vulnerabilities found ✅</p>"
+              else
+                "<p>vulnerabilities found ⚠️</p>" +
+                "<ul>" + ($vulns | group_by(.Severity) | map("<li>\(.[0].Severity): \(length)</li>") | join("")) + "</ul>"
+              end
           ' "$TRIVY_JSON" >> trivy.html
-          echo '</ul>' >> trivy.html
 
           echo '<h3>Full list</h3>' >> trivy.html
           echo '<table><thead><tr><th>Severity</th><th>PkgName</th><th>InstalledVersion</th><th>FixedVersion</th><th>Status</th><th>Title</th></tr></thead><tbody>' >> trivy.html
-          jq -r '.Results[]?.Vulnerabilities[]?|"<tr><td>\(.Severity//""|@html)</td><td>\(.PkgName//""|@html)</td><td>\(.InstalledVersion//""|@html)</td><td>\(.FixedVersion//""|@html)</td><td>\(.Status//""|@html)</td><td>\(.Title//""|@html)</td></tr>"' "$TRIVY_JSON" >> trivy.html
+          jq -r '.Results[]?.Vulnerabilities[]?|select(.Severity != null)|"<tr><td>\(.Severity//""|@html)</td><td>\(.PkgName//""|@html)</td><td>\(.InstalledVersion//""|@html)</td><td>\(.FixedVersion//""|@html)</td><td>\(.Status//""|@html)</td><td>\(.Title//""|@html)</td></tr>"' "$TRIVY_JSON" >> trivy.html
           echo '</tbody></table>' >> trivy.html
 
       - name: Paste Trivy report into github
