@@ -131,7 +131,7 @@ jobs:
             | if ($vulns | length) == 0 then
                 "<p>No vulnerabilities found ✅</p>"
               else
-                "<p>vulnerabilities found ⚠️</p>" +
+                "<p>" + ($vulns | length | tostring) + " vulnerabilities found ⚠️</p>" +
                 "<ul>" + ($vulns | group_by(.Severity) | map("<li>\(.[0].Severity): \(length)</li>") | join("")) + "</ul>"
               end
           ' "$TRIVY_JSON" >> trivy.html
