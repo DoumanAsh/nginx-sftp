@@ -127,7 +127,7 @@ jobs:
         with:
           image_ref: "${{env.DOCKER_REGISTRY}}/${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.alpine_version }}"
           image_name: "nginx-sftp:${{ matrix.alpine_version }}"
-          pr_comment: github.event_name == 'pull_request'
+          pr_comment: ${{ github.event_name == 'pull_request' }}
           pr_comment_recreate: true
 
       - name: Push Docker image
