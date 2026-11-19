@@ -123,7 +123,7 @@ jobs:
           echo "- Alpine version: $VERSION" >> $GITHUB_STEP_SUMMARY
 
       - name: Check vulnerabilities
-        uses: DoumanAsh/douman-ci/.github/actions/trivy-report-vuln@v1.1.4
+        uses: DoumanAsh/douman-ci/.github/actions/trivy-report-vuln@master
         with:
           image_ref: "${{env.DOCKER_REGISTRY}}/${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.alpine_version }}"
           image_name: "nginx-sftp:${{ matrix.alpine_version }}"
